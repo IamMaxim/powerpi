@@ -1,6 +1,7 @@
 {
 	"enableInstallTelemetry": false,
 	"enableAnalytics": false,
+	"theme": "pitcock",
 	"retry": {
 		"enabled": true,
 		"maxRetries": 6,
@@ -14,6 +15,7 @@
 		"npm:pi-subagents@0.40.0",
 		"npm:@diegopetrucci/pi-permission-gate@0.1.11",
 		"npm:pi-web-access@0.17.1",
-		"npm:pi-simplify@0.2.3"
+		"npm:pi-simplify@0.2.3",
+		"npm:pi-open-tui@0.2.10"
 	]
 }

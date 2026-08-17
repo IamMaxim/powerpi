@@ -67,6 +67,7 @@ infra to release them), or install pi packages from git sources instead.
 | `@diegopetrucci/pi-permission-gate@0.1.11` | The guardrail philosophy here is "mostly bypass, gate the genuinely dangerous": prompts only on `rm -rf` / `sudo` / `chmod 777`-class commands and writes to `.git`, `node_modules`, `.env*`. No other friction. |
 | `pi-web-access@0.17.1` | **Fetch-only, whitelisted.** `web_search` is disabled; `fetch_content` works against an allowlist (github, crates.io, docs.rs, …) with hosted extraction providers pinned off — no URL or query leaves the machine except to the allowlisted host itself. GitHub repo cloning stays on. See `config/web-search.json`. |
 | `pi-simplify@0.2.3` | `/simplify` reviews only changed lines (proper `git diff` scoping) for clarity/consistency. |
+| `pi-open-tui@0.2.10` | Replaces pi's header/footer/editor chrome: model + thinking level + cwd up top, git state / context gauge / token counts / cost in the footer, framed editor. Public extension APIs only, no prototype patching, no network calls (its "telemetry" is on-screen turn stats). All of it paints through the active theme's named colors, which is what makes the pitcock theme below carry the whole UI. Configure via `/open-tui`. |
 
 Versions are pinned deliberately, and to one coherent era — pi's extension
 API moves fast enough that packages break against a pi from a different month
@@ -94,6 +95,14 @@ re-run bootstrap.
   prose over bullet inventories, mandatory verification sentence).
 - **`config/`** — `web-search.json` (the fetch lockdown) and `models.json`
   (provider template), both symlinked into place.
+- **`themes/pitcock.json`** — the default theme, ported from the pitcock
+  design language: warm near-black surfaces, ivory text, a single amber
+  accent (borders, selection, headings), semantic hues reserved for meaning
+  (green success, red error, purple custom messages), and a warm "heat ramp"
+  for thinking levels. Syntax highlighting is classic Monokai. Symlinked into
+  `~/.pi/agent/themes/` (rather than shipped via the package registration) so
+  pi live-reloads edits; switch away with `/theme`, but note the baseline
+  resets `theme` on each bootstrap run.
 - **`settings.baseline.json`** — telemetry off (`enableInstallTelemetry` is
   the only default-on phone-home in pi), analytics off, pinned packages, and a
   widened `retry` policy. pi's defaults tolerate only ~14s of provider errors
@@ -126,4 +135,3 @@ directories, and the cwd — no extension needed for project instructions.
   transcript directly.
 - `pi-acp` — no ACP editor in this setup.
 - Notifications — local desktop use; you're at the desk.
-- UI/theme suites — live with the stock TUI first, add taste later.
