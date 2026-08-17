@@ -35,6 +35,30 @@ Auth (pick one):
 - **OpenRouter, for testing** — `export OPENROUTER_API_KEY=...` (built-in
   provider; no models.json entry needed)
 
+Keep secrets out of tracked dotfiles: put the exports in a chmod-600 file
+(e.g. `~/.config/powerpi/env`) and source it from your shell rc.
+
+### Corporate networks
+
+A bare `Error: Connection error.` from pi is the OpenAI SDK swallowing the
+real cause. Triage: `curl -v "$BASE_URL/models"` first; if curl works but pi
+doesn't, it's Node-specific — almost always one of:
+
+- **TLS interception / private CA** — Node ignores the system trust store.
+  `export NODE_EXTRA_CA_CERTS=/path/to/corp-ca.pem` (alongside the API key in
+  the env file).
+- **Proxy env** — pi honors `HTTPS_PROXY`, which can route an *internal*
+  endpoint through a proxy that can't reach it: set `NO_PROXY` (and lowercase
+  `no_proxy`) for the endpoint host. The inverse applies if the endpoint is
+  only reachable via the proxy.
+
+For the raw cause: `NODE_DEBUG=undici,net,tls pi -p "hi"`.
+
+Artifactory-style registries quarantine package versions for ~2 weeks from
+the **first request**, not from npm publish — so pin-downgrading chases a
+moving target. Request the pinned versions once, wait out the window (or ask
+infra to release them), or install pi packages from git sources instead.
+
 ## What's installed, and why
 
 | Package (pinned) | Why |
