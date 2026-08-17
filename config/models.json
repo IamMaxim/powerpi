@@ -1,0 +1,13 @@
+{
+	"providers": {
+		"work": {
+			"name": "Self-hosted (work)",
+			"baseUrl": "https://REPLACE-ME.example.com/v1",
+			"api": "openai-completions",
+			"apiKey": "$POWERPI_WORK_API_KEY",
+			"models": [
+				{ "id": "REPLACE-with-served-model-id" }
+			]
+		}
+	}
+}

@@ -1,0 +1,10 @@
+{
+	"name": "powerpi",
+	"version": "0.1.0",
+	"description": "Opinionated pi coding agent rig: pinned packages, fetch-only web, memory, prompt doctrine",
+	"private": true,
+	"license": "MIT",
+	"peerDependencies": {
+		"@earendil-works/pi-coding-agent": "*"
+	}
+}

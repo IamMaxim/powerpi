@@ -1,0 +1,42 @@
+{
+	"tools": {
+		"webSearch": { "enabled": false },
+		"sourceCheck": { "enabled": false },
+		"fetchContent": { "enabled": true },
+		"getSearchContent": { "enabled": true }
+	},
+	"commands": {
+		"websearch": { "enabled": false },
+		"curator": { "enabled": false },
+		"search": { "enabled": true },
+		"google-account": { "enabled": false }
+	},
+	"fetchRouting": {
+		"providers": ["http"],
+		"allowRemoteHostedProviders": false
+	},
+	"fetchContent": {
+		"domainPolicy": {
+			"allow": [
+				"github.com",
+				"raw.githubusercontent.com",
+				"objects.githubusercontent.com",
+				"gist.github.com",
+				"crates.io",
+				"static.crates.io",
+				"docs.rs",
+				"doc.rust-lang.org",
+				"rust-lang.github.io",
+				"lib.rs",
+				"registry.npmjs.org",
+				"www.npmjs.com",
+				"developer.mozilla.org"
+			]
+		}
+	},
+	"githubClone": { "enabled": true },
+	"youtube": { "enabled": false },
+	"video": { "enabled": false },
+	"image": { "enabled": false },
+	"allowBrowserCookies": false
+}
