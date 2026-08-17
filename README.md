@@ -41,7 +41,7 @@ Auth (pick one):
 |---|---|
 | `pi-subagents@0.40.0` | Delegation: named agents (reviewer/scout/oracle), parallel fan-out, background runs. The most mature of the four subagent implementations. |
 | `@diegopetrucci/pi-permission-gate@0.1.11` | The guardrail philosophy here is "mostly bypass, gate the genuinely dangerous": prompts only on `rm -rf` / `sudo` / `chmod 777`-class commands and writes to `.git`, `node_modules`, `.env*`. No other friction. |
-| `pi-web-access@0.18.0` | **Fetch-only, whitelisted.** `web_search` is disabled; `fetch_content` works against an allowlist (github, crates.io, docs.rs, …) with hosted extraction providers pinned off — no URL or query leaves the machine except to the allowlisted host itself. GitHub repo cloning stays on. See `config/web-search.json`. |
+| `pi-web-access@0.17.1` | **Fetch-only, whitelisted.** `web_search` is disabled; `fetch_content` works against an allowlist (github, crates.io, docs.rs, …) with hosted extraction providers pinned off — no URL or query leaves the machine except to the allowlisted host itself. GitHub repo cloning stays on. See `config/web-search.json`. |
 | `pi-simplify@0.2.3` | `/simplify` reviews only changed lines (proper `git diff` scoping) for clarity/consistency. |
 
 Versions are pinned deliberately, and to one coherent era — pi's extension
