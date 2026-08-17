@@ -6,7 +6,12 @@
 			"api": "openai-completions",
 			"apiKey": "$POWERPI_WORK_API_KEY",
 			"models": [
-				{ "id": "REPLACE-with-served-model-id" }
+				{
+					"id": "REPLACE-with-served-model-id",
+					"contextWindow": 128000,
+					"maxTokens": 16384,
+					"reasoning": false
+				}
 			]
 		}
 	}
