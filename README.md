@@ -95,7 +95,13 @@ re-run bootstrap.
 - **`config/`** — `web-search.json` (the fetch lockdown) and `models.json`
   (provider template), both symlinked into place.
 - **`settings.baseline.json`** — telemetry off (`enableInstallTelemetry` is
-  the only default-on phone-home in pi), analytics off, pinned packages.
+  the only default-on phone-home in pi), analytics off, pinned packages, and a
+  widened `retry` policy. pi's defaults tolerate only ~14s of provider errors
+  (3 turn retries, and **zero** HTTP-level retries on OpenAI-compatible
+  endpoints), so a sustained 429 kills subagent fan-outs. The baseline sets 6
+  turn retries × 6 requests each with `Retry-After` honored up to 120s —
+  minutes of tolerance. Subagents inherit it automatically: they are plain
+  `pi` child processes reading the same settings.
 
 Note pi natively loads `AGENTS.md`/`CLAUDE.md` from `~/.pi/agent/`, ancestor
 directories, and the cwd — no extension needed for project instructions.
