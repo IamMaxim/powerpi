@@ -4,6 +4,9 @@
 set -euo pipefail
 
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# One coherent era: pi and its packages must match (extension API moves fast),
+# and everything must predate npm-proxy quarantine windows (~2 weeks).
+PI_VERSION=0.83.0
 PI_AGENT_DIR="$HOME/.pi/agent"
 
 command -v npm >/dev/null || { echo "error: npm not found — install Node.js first" >&2; exit 1; }
@@ -27,7 +30,7 @@ ERR
 		exit 1
 	fi
 	echo "==> Installing pi"
-	npm install -g --ignore-scripts @earendil-works/pi-coding-agent
+	npm install -g --ignore-scripts "@earendil-works/pi-coding-agent@$PI_VERSION"
 else
 	echo "==> pi already installed ($(pi --version 2>/dev/null || echo unknown))"
 fi
@@ -49,10 +52,10 @@ const identity = (p) => {
 	const s = typeof p === "string" ? p : p.source ?? "";
 	return s.replace(/^npm:/, "").replace(/(.+)@.*$/, "$1");
 };
-const existing = new Set((settings.packages ?? []).map(identity));
+const fromBaseline = new Set(baseline.packages.map(identity));
 settings.packages = [
-	...(settings.packages ?? []),
-	...baseline.packages.filter((p) => !existing.has(identity(p))),
+	...baseline.packages,
+	...(settings.packages ?? []).filter((p) => !fromBaseline.has(identity(p))),
 ];
 for (const [k, v] of Object.entries(baseline)) if (k !== "packages") settings[k] = v;
 

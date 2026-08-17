@@ -39,13 +39,17 @@ Auth (pick one):
 
 | Package (pinned) | Why |
 |---|---|
-| `pi-subagents@0.50.0` | Delegation: named agents (reviewer/scout/oracle), parallel fan-out, background runs. The most mature of the four subagent implementations. |
+| `pi-subagents@0.40.0` | Delegation: named agents (reviewer/scout/oracle), parallel fan-out, background runs. The most mature of the four subagent implementations. |
 | `@diegopetrucci/pi-permission-gate@0.1.12` | The guardrail philosophy here is "mostly bypass, gate the genuinely dangerous": prompts only on `rm -rf` / `sudo` / `chmod 777`-class commands and writes to `.git`, `node_modules`, `.env*`. No other friction. |
-| `pi-web-access@0.23.0` | **Fetch-only, whitelisted.** `web_search` is disabled; `fetch_content` works against an allowlist (github, crates.io, docs.rs, …) with hosted extraction providers pinned off — no URL or query leaves the machine except to the allowlisted host itself. GitHub repo cloning stays on. See `config/web-search.json`. |
+| `pi-web-access@0.18.0` | **Fetch-only, whitelisted.** `web_search` is disabled; `fetch_content` works against an allowlist (github, crates.io, docs.rs, …) with hosted extraction providers pinned off — no URL or query leaves the machine except to the allowlisted host itself. GitHub repo cloning stays on. See `config/web-search.json`. |
 | `pi-simplify@0.2.3` | `/simplify` reviews only changed lines (proper `git diff` scoping) for clarity/consistency. |
 
-Versions are pinned deliberately: pi packages run with full system access, so
-updates are reviewed diffs, not `pi update --all`. To bump one:
+Versions are pinned deliberately, and to one coherent era — pi's extension
+API moves fast enough that packages break against a pi from a different month
+(`bootstrap.sh` pins pi itself for the same reason). The current set also
+predates 2026-08-04, clearing npm-proxy quarantine windows (~2 weeks) on
+corporate registries. pi packages run with full system access, so updates are
+reviewed diffs, not `pi update --all`. To bump one:
 `npm view <pkg> version`, review the changes, edit `settings.baseline.json`,
 re-run bootstrap.
 
