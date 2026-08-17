@@ -11,6 +11,21 @@ node -e 'const [maj,min]=process.versions.node.split(".").map(Number); process.e
 	|| { echo "error: pi requires Node >= 22.19 (current: $(node --version))" >&2; exit 1; }
 
 if ! command -v pi >/dev/null; then
+	NPM_PREFIX="$(npm prefix -g)"
+	if [ ! -w "$NPM_PREFIX/bin" ] || { [ -d "$NPM_PREFIX/lib/node_modules" ] && [ ! -w "$NPM_PREFIX/lib/node_modules" ]; }; then
+		cat >&2 <<ERR
+error: npm global prefix ($NPM_PREFIX) is not user-writable (system Node install).
+Do NOT chmod/sudo it — install Node in userspace instead. Either:
+  - nvm (recommended, also gets you Node >= 22.19):
+      curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
+      exec \$SHELL; nvm install 22
+  - or keep system Node (if >= 22.19) with a user prefix:
+      npm config set prefix ~/.npm-global
+      export PATH=~/.npm-global/bin:\$PATH   # add to your shell rc too
+Then re-run this script.
+ERR
+		exit 1
+	fi
 	echo "==> Installing pi"
 	npm install -g --ignore-scripts @earendil-works/pi-coding-agent
 else

@@ -22,6 +22,12 @@ registers this repo as a local pi package (extensions, skills, prompts).
 Re-run it any time; it's idempotent, and because configs are symlinks, edits
 in the repo apply live.
 
+Requirements: Node >= 22.19 with a **user-writable npm global prefix**. On
+Linux with distro-packaged Node the prefix is `/usr` — don't sudo/chmod it;
+install Node via nvm instead (`nvm install 22`), or point npm at a user prefix
+(`npm config set prefix ~/.npm-global` + PATH). Bootstrap checks both and
+tells you which fix applies.
+
 Auth (pick one):
 
 - **Self-hosted OpenAI-compatible endpoint** — edit `config/models.json`
