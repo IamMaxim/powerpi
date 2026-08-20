@@ -22,6 +22,7 @@ const calls: Record<string, unknown> = {
 	ls: { path: "src" },
 	read: { path: "src/index.ts" },
 	write: { content: "one\ntwo\nthree", path: "src/new.ts" },
+	subagent: { agent: "reviewer", task: "Inspect the current UI" },
 };
 
 function toolRow(name: string, args: unknown, tool?: ToolDefinition): ToolExecutionComponent {
@@ -104,6 +105,42 @@ describe("compact built-in tools", () => {
 			expect(plain).toContain("const oldValue = true;");
 			expect(plain).toContain("const newValue = true;");
 			expect(rendered).toContain("\x1b[");
+		} finally {
+			restore();
+		}
+	});
+
+	test("shows subagent tool, token, and duration facts", () => {
+		const restore = installCompactToolRows();
+		try {
+			const row = toolRow("subagent", calls.subagent);
+			row.updateResult(
+				{
+					content: [{ type: "text", text: "Review complete" }],
+					details: {
+						results: [{ progressSummary: { toolCount: 3, tokens: 12400, durationMs: 12_345 } }],
+					},
+					isError: false,
+				},
+				false,
+			);
+			const line = row.render(80).join("");
+			expect(line).toContain("✓");
+			expect(line).toContain("subagent");
+			expect(line).toContain("reviewer");
+			expect(line).toContain("3 tools · 12.4k tokens · 12.3s");
+
+			row.updateResult(
+				{
+					content: [{ type: "text", text: "Working" }],
+					details: { progress: [{ toolCount: 2, tokens: 8200, durationMs: 6400 }] },
+					isError: false,
+				},
+				true,
+			);
+			const liveLine = row.render(80).join("");
+			expect(liveLine).toContain("·");
+			expect(liveLine).toContain("2 tools · 8.2k tokens · 6.4s");
 		} finally {
 			restore();
 		}

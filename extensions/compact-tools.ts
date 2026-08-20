@@ -97,6 +97,41 @@ function renderLine(
 	return text;
 }
 
+function formatCount(value: number): string {
+	if (value < 1000) return String(value);
+	if (value < 1_000_000) return `${(value / 1000).toFixed(value < 100_000 ? 1 : 0)}k`;
+	return `${(value / 1_000_000).toFixed(1)}m`;
+}
+
+function formatDuration(durationMs: number): string {
+	if (durationMs < 1000) return `${durationMs}ms`;
+	if (durationMs < 60_000) return `${(durationMs / 1000).toFixed(1)}s`;
+	return `${Math.floor(durationMs / 60_000)}m${Math.floor((durationMs % 60_000) / 1000)}s`;
+}
+
+interface SubagentFacts {
+	toolCount?: number;
+	tokens?: number;
+	durationMs?: number;
+}
+
+function subagentSummary(result: AgentToolResult<unknown>): string | undefined {
+	const details = result.details as {
+		progress?: SubagentFacts[];
+		results?: Array<{ progressSummary?: SubagentFacts }>;
+	} | undefined;
+	const progress = details?.progress;
+	const summaries = progress?.length
+		? progress
+		: details?.results?.map((entry) => entry.progressSummary).filter((entry): entry is SubagentFacts => Boolean(entry));
+	if (!summaries || summaries.length === 0) return undefined;
+	const toolCount = summaries.reduce((total, entry) => total + (entry.toolCount ?? 0), 0);
+	const tokens = summaries.reduce((total, entry) => total + (entry.tokens ?? 0), 0);
+	const durationMs = summaries.reduce((total, entry) => total + (entry.durationMs ?? 0), 0);
+	const facts = [`${toolCount} tools`, `${formatCount(tokens)} tokens`, formatDuration(durationMs)];
+	return facts.join(" · ");
+}
+
 function countDiff(details: EditToolDetails | undefined): string | undefined {
 	if (!details?.diff) return undefined;
 	let additions = 0;
@@ -170,6 +205,10 @@ const compactRenderers: Record<string, CompactRenderer> = {
 			const count = lineCount(textOutput(result));
 			return count > 0 ? `${count} entries` : undefined;
 		},
+	},
+	subagent: {
+		call: (args) => ({ subject: compactText(args.agent ?? args.action, "run") }),
+		summary: subagentSummary,
 	},
 };
 
@@ -340,8 +379,25 @@ export function installCompactToolRows(getTheme: () => Theme | undefined = () =>
 		return rendered;
 	};
 	const patchedRender = function (this: ToolExecutionComponent, width: number): string[] {
-		const rendered = originalRender.call(this, width);
 		const row = this as unknown as ToolRowInternals;
+		if (row.toolName === "subagent" && !row.expanded) {
+			const renderer = compactRenderers.subagent!;
+			const call = renderer.call(row.args);
+			const summary = row.result && !row.result.isError
+				? subagentSummary(row.result as AgentToolResult<unknown>)
+				: row.result?.isError
+					? errorSummary(row.result as AgentToolResult<unknown>)
+					: undefined;
+			const currentTheme = getTheme() ?? ({
+				fg: (_color: string, text: string) => text,
+				bold: (text: string) => text,
+			} as Theme);
+			return [truncateToWidth(renderLine("subagent", call, currentTheme, {
+				isError: row.result?.isError ?? false,
+				isPartial: row.isPartial,
+			}, summary), width, "…")];
+		}
+		const rendered = originalRender.call(this, width);
 		const withoutOuterSpacer = rendered[0] === "" ? rendered.slice(1) : rendered;
 		if (row.expanded || (row.toolName === "edit" && row.result && !row.result.isError)) return withoutOuterSpacer;
 
