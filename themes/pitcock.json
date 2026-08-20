@@ -35,14 +35,14 @@
 		"thinkingText": "textMute",
 
 		"selectedBg": "accentSoftBg",
-		"userMessageBg": "surfaceHi",
+		"userMessageBg": "",
 		"userMessageText": "text",
 		"customMessageBg": "talkSoftBg",
 		"customMessageText": "text",
 		"customMessageLabel": "talk",
-		"toolPendingBg": "surface",
-		"toolSuccessBg": "successSoftBg",
-		"toolErrorBg": "dangerSoftBg",
+		"toolPendingBg": "",
+		"toolSuccessBg": "",
+		"toolErrorBg": "",
 		"toolTitle": "text",
 		"toolOutput": "textDim",
 

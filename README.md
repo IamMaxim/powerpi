@@ -85,6 +85,15 @@ re-run bootstrap.
   a `MEMORY.md` index injected into the system prompt each turn, and a skill
   teaching the agent the write conventions. Same format as my Claude Code
   memory, so the two can share a store later.
+- **`extensions/compact-tools.ts`** — trace-UI fork of
+  [`pi-minimalist-ui`](https://github.com/zackerydev/pi-minimalist-ui): Pi's
+  built-ins collapse to a single status/path/summary row, except `edit`, which
+  keeps its colored diff visible for live review. `Ctrl+O` retains full output
+  for the remaining tools. A defensive row-level adapter also compacts
+  third-party tools without replacing their execution or expanded renderers.
+  User messages use a transparent background with a compact bold purple rail;
+  editor, footer, and working indicator remain owned by `pi-open-tui`. The
+  upstream MIT notice is retained in `LICENSES/pi-minimalist-ui.txt`.
 - **`system-prompts/APPEND_SYSTEM.md`** — appended to pi's default system
   prompt (symlinked to `~/.pi/agent/APPEND_SYSTEM.md`). Carries the working
   doctrine: think before coding, simplicity first, surgical changes,

@@ -13,7 +13,8 @@ command -v npm >/dev/null || { echo "error: npm not found — install Node.js fi
 node -e 'const [maj,min]=process.versions.node.split(".").map(Number); process.exit(maj>22||(maj===22&&min>=19)?0:1)' \
 	|| { echo "error: pi requires Node >= 22.19 (current: $(node --version))" >&2; exit 1; }
 
-if ! command -v pi >/dev/null; then
+INSTALLED_PI_VERSION="$(pi --version 2>/dev/null || true)"
+if [ "$INSTALLED_PI_VERSION" != "$PI_VERSION" ]; then
 	NPM_PREFIX="$(npm prefix -g)"
 	if [ ! -w "$NPM_PREFIX/bin" ] || { [ -d "$NPM_PREFIX/lib/node_modules" ] && [ ! -w "$NPM_PREFIX/lib/node_modules" ]; }; then
 		cat >&2 <<ERR
@@ -29,10 +30,10 @@ Then re-run this script.
 ERR
 		exit 1
 	fi
-	echo "==> Installing pi"
+	echo "==> Installing pi $PI_VERSION (current: ${INSTALLED_PI_VERSION:-not installed})"
 	npm install -g --ignore-scripts "@earendil-works/pi-coding-agent@$PI_VERSION"
 else
-	echo "==> pi already installed ($(pi --version 2>/dev/null || echo unknown))"
+	echo "==> pi already pinned at $PI_VERSION"
 fi
 
 echo "==> Preparing memory dir"
