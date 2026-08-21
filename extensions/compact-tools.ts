@@ -434,6 +434,7 @@ export default function compactTools(pi: ExtensionAPI) {
 	const restoreRows = installCompactToolRows(() => activeTheme);
 	pi.on("session_start", (_event, ctx) => {
 		activeTheme = ctx.ui.theme;
+		ctx.ui.setHiddenThinkingLabel("бр бр бр...");
 	});
 	pi.on("session_shutdown", restoreRows);
 }
