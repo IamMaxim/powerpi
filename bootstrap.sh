@@ -81,6 +81,8 @@ link "$REPO_DIR/system-prompts/APPEND_SYSTEM.md" "$PI_AGENT_DIR/APPEND_SYSTEM.md
 # Custom-themes dir (not the package registration) so pi live-reloads edits.
 mkdir -p "$PI_AGENT_DIR/themes"
 link "$REPO_DIR/themes/pitcock.json" "$PI_AGENT_DIR/themes/pitcock.json"
+# powersa rides Node >= 22.19 type stripping, so the .ts file runs directly.
+link "$REPO_DIR/bin/powersa.ts" "$(npm prefix -g)/bin/powersa"
 
 echo "==> Registering this repo as a pi package"
 pi install "$REPO_DIR"

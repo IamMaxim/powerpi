@@ -13,6 +13,6 @@
 		"skipLibCheck": true,
 		"noEmit": true
 	},
-	"include": ["extensions/**/*.ts", "test/**/*.ts"],
+	"include": ["bin/**/*.ts", "extensions/**/*.ts", "test/**/*.ts"],
 	"exclude": ["node_modules"]
 }

@@ -85,15 +85,62 @@ re-run bootstrap.
   a `MEMORY.md` index injected into the system prompt each turn, and a skill
   teaching the agent the write conventions. Same format as my Claude Code
   memory, so the two can share a store later.
-- **`extensions/compact-tools.ts`** — trace-UI fork of
+- **`extensions/compact-tools.ts`** + **`extensions/goal-ui.ts`** — trace-UI fork of
   [`pi-minimalist-ui`](https://github.com/zackerydev/pi-minimalist-ui): Pi's
   built-ins collapse to a single status/path/summary row, except `edit`, which
   keeps its colored diff visible for live review. `Ctrl+O` retains full output
   for the remaining tools. A defensive row-level adapter also compacts
   third-party tools without replacing their execution or expanded renderers.
   User messages use a transparent background with a compact bold purple rail;
-  editor, footer, and working indicator remain owned by `pi-open-tui`. The
+  goal lifecycle messages are transparent compact rows that include the current
+  objective, while `Ctrl+O` retains usage details. Editor, footer, and working
+  indicator remain owned by `pi-open-tui`. The
   upstream MIT notice is retained in `LICENSES/pi-minimalist-ui.txt`.
+- **`extensions/dsml-guard.ts`** — recovers turns broken by leaked DSML
+  tool-call markup. The self-hosted DeepSeek endpoint sometimes emits
+  malformed tool-call syntax (`< | DSML | tool calls>`-style tokens) as plain
+  text or thinking instead of a parsed tool call; the turn then stops with
+  nothing executed — silently fatal in one-shot runs. On such a turn the
+  guard queues a follow-up message telling the model to re-issue the call,
+  capped at 2 consecutive nudges so a persistently broken model can't loop.
+- **`extensions/output-limit-guard.ts`** — breaks the truncated-tool-call
+  loop on output-capped endpoints. When the self-hosted endpoint cuts a
+  response at its output-token limit (typically one giant file-write call),
+  pi fails the truncated calls and the model re-issues the same oversized
+  call forever. Layer one wraps the `work` provider's stream
+  (`$POWERPI_ELASTIC_PROVIDER` to change): a "length" stop silently repeats
+  the *identical* request once with the cap raised to 64k
+  (`$POWERPI_RETRY_MAX_TOKENS`), so the truncated attempt never enters the
+  session. Layer two, any provider: if even that truncates, a steering
+  message tells the model to split the work into a series of small tool
+  calls, capped at 2 nudges per incident. The in-provider retry needs a real
+  length-stop to verify end-to-end — unit-tested here, live behavior
+  confirmed only up to extension load and provider composition.
+- **`extensions/evidence-log.ts`** — append-only JSONL evidence at
+  `~/.pi/agent/evidence.jsonl` (`$POWERPI_EVIDENCE_FILE` to move it) for
+  diagnosing endpoint misbehavior constructively instead of by anecdote.
+  Every request through the elastic provider leaves an `http` line (request
+  body hash/size, duration, status); non-2xx and thrown fetches become
+  `http_error` lines with the full response body and headers — ground truth
+  for what the backend returned. Session-level lines capture `turn_error` /
+  `truncation` (stopReason, rawStopReason, errorMessage, usage, last payload
+  hash), `dsml_leak` (with an excerpt around the leak), and `elastic_retry`
+  (the silent in-provider retry, which otherwise never reaches the session).
+  A clean run writes nothing.
+- **`bin/powersa.ts`** + **`prompts/roles/`** — `powersa <role> "<task>"
+  [--cwd <dir>]`: one-shot pi subagents for delegation from a frontier
+  orchestrator (Claude Code), so cheap self-hosted models absorb exploration
+  and routine edits while the frontier model keeps the reasoning. Runs
+  `pi -p --mode json` with the role prompt (`scout` read-only exploration,
+  `worker` well-specified changes) appended to pi's normal system prompt;
+  prints only the agent's final message to stdout, tool-call progress and the
+  session path to stderr, exits non-zero if the agent errored out. Sessions
+  land in `~/.pi/powersa/sessions` for post-mortem, out of the interactive
+  `--resume` list. Model: `$POWERSA_MODEL` ("provider/model-id"), else the
+  first model of the `work` provider in `models.json`. Bootstrap symlinks it
+  into the npm global bin. From Claude Code, run it via background Bash with
+  a self-contained task brief — the subagent sees none of the caller's
+  context, and the caller sees only the final report.
 - **`system-prompts/APPEND_SYSTEM.md`** — appended to pi's default system
   prompt (symlinked to `~/.pi/agent/APPEND_SYSTEM.md`). Carries the working
   doctrine: think before coding, simplicity first, surgical changes,
