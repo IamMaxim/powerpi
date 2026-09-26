@@ -127,6 +127,7 @@ re-run bootstrap.
   hash), `dsml_leak` (with an excerpt around the leak), and `elastic_retry`
   (the silent in-provider retry, which otherwise never reaches the session).
   A clean run writes nothing.
+- **`extensions/zai-usage.ts`** — Z.AI GLM Coding Plan quota in the footer: plan tier plus 5-hour-window and weekly percentages (`z.ai max: 5h 0.4% · wk 0.1%`), straight from the server via `GET /api/monitor/usage/quota/limit` (undocumented, but the same call the Z.AI console makes; Bearer key resolved from the provider auth chain, `$ZAI_API_KEY` fallback). Handles both the current `CREDIT_LIMIT` shape and legacy `TOKENS_LIMIT` plans, recomputes percentages from used/total because the API rounds sub-1% values up, and auto-switches to `open.bigmodel.cn` for `-cn` providers (`$POWERPI_ZAI_USAGE_BASE`/`$POWERPI_ZAI_USAGE_PROVIDER` to override). The line goes through `ctx.ui.setStatus`, which pi-open-tui renders in its extension-status footer segment; `/zai-usage` toggles a detail widget (credits used/total, reset countdowns, tool quota). Refreshes at session start, after each assistant message (30s throttle), and every 2 minutes; gated on `ctx.hasUI` so powersa/subagent one-shots make no extra network calls.
 - **`bin/powersa.ts`** + **`prompts/roles/`** — `powersa <role> "<task>"
   [--cwd <dir>]`: one-shot pi subagents for delegation from a frontier
   orchestrator (Claude Code), so cheap self-hosted models absorb exploration
